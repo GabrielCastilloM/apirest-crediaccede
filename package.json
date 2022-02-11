@@ -1,7 +1,7 @@
 {
   "name": "si-credit-gb",
   "version": "1.0.0",
-  "description": "Sistema de informacion de creditos",
+  "description": "Sistema de información de créditos",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
@@ -16,5 +16,8 @@
     "eslint-plugin-prettier": "^4.0.0",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1"
+  },
+  "dependencies": {
+    "express": "^4.17.2"
   }
 }
