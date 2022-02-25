@@ -1,59 +1,65 @@
 const express = require('express');
-const router = express.Router();
 
 const UserService = require('../services/user.service');
+const router = express.Router();
+const validatorHandler = require('./../middlewares/validator.handler');
+const {createUserSchema, updateUserSchema, getUserSchema,} = require('./../schemas/user.schema');
 const service = new UserService();
 
-router.get('/', (req, res) => {
-  res.send ('hola Soy la ruta principal de usuarios')
-})
+router.get('/', async (req, res) => {
+  const users = await service.find();
+  res.json(users);
+});
 
-router.get('/usuario1', (req, res) => {
-  res.json ({
-    name: 'Gabriel',
-    apellido: 'castillo',
-    cedula: 10308124
-  })
-})
+router.get('/:id',
+  validatorHandler(getUserSchema, 'params'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const user = await service.findOne(id);
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
-//para recibir paramentros por url utilizando params
-router.get('/params/:name', (req, res) => {
-  const name = req.params.name
-  res.send(`hola mi nombre es ${name}`)
-})
-/*para recibir paramentros por url utilizando query pasamos la url asi
-//http://localhost:3000/api/v1/users/query?limit=10&offset=200 esto se utiliza para la paginacion*/
-router.get('/query', (req, res) => {
-  const {limit, offset} = req.query;
-  if (limit && offset) {
-    res.json({
-      limit,
-      offset,
+router.post('/',
+  validatorHandler(createUserSchema, 'body'),
+  async (req, res) => {
+    const body = req.body;
+    const newUser = await service.create(body);
+    res.status(201).json(newUser);
+  }
+);
+
+router.patch('/:id',
+  validatorHandler(getUserSchema, 'params'),
+  validatorHandler(updateUserSchema, 'body'),
+  async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const body = req.body;
+      const user = await service.update(id, body);
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.delete('/:id',
+  validatorHandler(getUserSchema, 'params'),
+  async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await service.delete(id);
+    res.json(user);
+  } catch (error) {
+    res.status(404).json({
+      message: error.message,
     });
-  } else {
-    res.send('No hay parametros')
   }
 });
 
-router.post('/', (req, res) => {
-  const body = req.body;
-  const newUser = service.create(body);
-  res.status(201).json(newUser);
-});
-
-router.patch('/:id', (req, res) => {
-  const {id} = req.params;
-  const body = req.body;
-  const user = service.update(id, body)
-  res.json(user)
-});
-
-router.delete('/:id', (req, res) => {
-  const {id} = req.params;
-  const user = service.delete(id)
-  res.json(user)
-})
-
-
 module.exports = router;
-

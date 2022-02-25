@@ -1,3 +1,6 @@
+
+const boom = require('@hapi/boom');
+
 class userService {
   constructor() {
     this.users = [];
@@ -17,19 +20,39 @@ class userService {
     })
   }
 
-  create(data) {
+  find() {
+    return new Promise((resolve, ) => {
+      setTimeout(() => {
+        resolve(this.users);
+      }, 1000);
+    })
+  }
+
+  async findOne(id) {
+     //find() retorna el objeto encontrado
+    const user = this.users.find(item => item.id === parseInt(id));
+    if (!user) {
+      throw boom.notFound('product not found');
+    }
+    if (user.isBlock) {
+      throw boom.conflict('user is block')
+    }
+    return user;
+  }
+
+  async create(data) {
     const newUser = {
       ...data
     }
     this.users.push(newUser)
     console.log(this.users);
-    return this.users;
+    return newUser;
   }
 
-  update(id, changes) {
+  async update(id, changes) {
     const index = this.users.findIndex(item => item.id === parseInt(id));
     if (index === -1) {
-      throw new Error('product not found');
+      throw boom.notFound('user not found');
     }
     const user = this.users[index];
     this.users[index] = {
@@ -39,17 +62,15 @@ class userService {
     return this.users[index]
   }
 
-  delete(id) {
+  async delete(id) {
     const index = this.users.findIndex(item => item.id === parseInt(id));
     if (index === -1) {
-      throw new Error('product not found');
+      throw boom.notFound('user not found');
     }
     this.users.splice(index, 1)
     console.log(this.users);
     return {id}
   }
-
-
 }
 
 module.exports = userService;
