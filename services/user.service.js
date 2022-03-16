@@ -1,43 +1,13 @@
 
 const boom = require('@hapi/boom');
 
-class userService {
+const pool = require('../libs/postgres.pool')
+
+class UserService {
   constructor() {
-    this.users = [];
-    this.enpujar()
-  }
-
-  enpujar() {
-    this.users.push({
-      id: 1,
-      name:'juan',
-      price: 2023
-    })
-    this.users.push({
-      id: 2,
-      name:'camilo',
-      price: 1500
-    })
-  }
-
-  find() {
-    return new Promise((resolve, ) => {
-      setTimeout(() => {
-        resolve(this.users);
-      }, 1000);
-    })
-  }
-
-  async findOne(id) {
-     //find() retorna el objeto encontrado
-    const user = this.users.find(item => item.id === parseInt(id));
-    if (!user) {
-      throw boom.notFound('product not found');
-    }
-    if (user.isBlock) {
-      throw boom.conflict('user is block')
-    }
-    return user;
+    this.pool = pool;
+    //por si hay un error en la coneccion
+    this.pool.on('error', (err) => console.error(err));
   }
 
   async create(data) {
@@ -48,6 +18,26 @@ class userService {
     console.log(this.users);
     return newUser;
   }
+
+  async find() {
+    const query = 'SELECT * FROM users';
+    const rta = await this.pool.query(query)
+    return rta.rows;
+  }
+
+  async findOne(id) {
+     //find() retorna el objeto encontrado
+    const user = this.users.find(item => item.id === parseInt(id));
+    if (!user) {
+      throw boom.notFound('user not found');
+    }
+    if (user.isBlock) {
+      throw boom.conflict('user is block')
+    }
+    return user;
+  }
+
+
 
   async update(id, changes) {
     const index = this.users.findIndex(item => item.id === parseInt(id));
@@ -73,4 +63,4 @@ class userService {
   }
 }
 
-module.exports = userService;
+module.exports = UserService;

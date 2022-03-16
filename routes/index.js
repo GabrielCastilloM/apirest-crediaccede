@@ -2,7 +2,7 @@ const express = require('express');
 
 //importamos archivos de routes
 const usersRouter = require('./users.router')
-const creditsRouter = require('./credits.routers')
+const creditsRouter = require('./credits.router')
 const paymentsRouter = require('./payments.router');
 
 function routerApi(app) {
