@@ -4,6 +4,7 @@ const express = require('express');
 const usersRouter = require('./users.router')
 const creditsRouter = require('./credits.router')
 const paymentsRouter = require('./payments.router');
+const customerRouter = require('./customers.router');
 
 function routerApi(app) {
    //creamos un patch global para todos los enpoints
@@ -13,6 +14,7 @@ function routerApi(app) {
    router.use('/users', usersRouter);
    router.use('/credits', creditsRouter);
    router.use('/payments', paymentsRouter);
+   router.use('/customers', customerRouter);
 }
 
 module.exports = routerApi;

@@ -1,23 +1,20 @@
 const Joi = require('joi');
 
 const id = Joi.number().integer();
-const name = Joi.string().min(3).max(15).messages({
-  'string.base': `" nombre "debe ser un tipo de 'texto'`,
-  'string.empty': `"nombre "no puede ser un campo vacío`,
-  'string.min': `"nombre" debe tener una longitud mínima de {#limit}`,
-  'string.max': `"nombre" debe tener una longitud máxima de {#limit}`
-});
-const price = Joi.number().integer().min(10);
+const email = Joi.string().email();
+const password = Joi.string().min(8);
+const role = Joi.string().min(5)
 
 const createUserSchema = Joi.object({
-  id: id.required(),
-  name: name.required(),
-  price: price.required(),
+  email: email.required(),
+  password: password.required(),
+  role: role.required()
 });
 
 const updateUserSchema = Joi.object({
-  name: name,
-  price: price,
+  email: email,
+  password: password,
+  role: role,
 });
 
 const getUserSchema = Joi.object({

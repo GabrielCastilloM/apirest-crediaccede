@@ -2,64 +2,45 @@
 const boom = require('@hapi/boom');
 
 const pool = require('../libs/postgres.pool')
+const {models} = require('./../libs/sequelize');
 
 class UserService {
   constructor() {
-    this.pool = pool;
+    //this.pool = pool;
     //por si hay un error en la coneccion
-    this.pool.on('error', (err) => console.error(err));
+    //this.pool.on('error', (err) => console.error(err));
   }
 
   async create(data) {
-    const newUser = {
-      ...data
-    }
-    this.users.push(newUser)
-    console.log(this.users);
+    const newUser = await models.User.create(data)
     return newUser;
   }
 
   async find() {
-    const query = 'SELECT * FROM users';
-    const rta = await this.pool.query(query)
-    return rta.rows;
+    const rta = await models.User.findAll({
+      include: 'customer'
+    });
+    return rta;
   }
 
   async findOne(id) {
-     //find() retorna el objeto encontrado
-    const user = this.users.find(item => item.id === parseInt(id));
-    if (!user) {
-      throw boom.notFound('user not found');
-    }
-    if (user.isBlock) {
-      throw boom.conflict('user is block')
-    }
+     const user = await models.User.findByPk(id)
+     if (!user) {
+       throw boom.notFound('user not found')
+     }
     return user;
   }
 
-
-
   async update(id, changes) {
-    const index = this.users.findIndex(item => item.id === parseInt(id));
-    if (index === -1) {
-      throw boom.notFound('user not found');
-    }
-    const user = this.users[index];
-    this.users[index] = {
-      ...user,
-      ...changes
-    };
-    return this.users[index]
+    const user = await this.findOne(id)
+    const rta = await user.update(changes)
+    return rta
   }
 
   async delete(id) {
-    const index = this.users.findIndex(item => item.id === parseInt(id));
-    if (index === -1) {
-      throw boom.notFound('user not found');
-    }
-    this.users.splice(index, 1)
-    console.log(this.users);
-    return {id}
+    const user = await this.findOne(id);
+    await user.destroy();
+    return { id };
   }
 }
 

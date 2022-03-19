@@ -22,7 +22,7 @@ router.get('/:id',
     try {
       const { id } = req.params;
       const user = await service.findOne(id);
-      res.json(user);
+      res.status(201).json(user);
     } catch (error) {
       next(error);
     }
@@ -31,10 +31,14 @@ router.get('/:id',
 
 router.post('/',
   validatorHandler(createUserSchema, 'body'),
-  async (req, res) => {
+  async (req, res, next) => {
+    try {
     const body = req.body;
     const newUser = await service.create(body);
     res.status(201).json(newUser);
+    } catch (error) {
+      next(error);
+    }
   }
 );
 
@@ -55,15 +59,13 @@ router.patch('/:id',
 
 router.delete('/:id',
   validatorHandler(getUserSchema, 'params'),
-  async (req, res) => {
+  async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = await service.delete(id);
     res.json(user);
   } catch (error) {
-    res.status(404).json({
-      message: error.message,
-    });
+    next(error);
   }
 });
 
